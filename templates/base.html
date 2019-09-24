@@ -1,6 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 	<meta charset="utf-8">
 	<title>Movies</title>
@@ -21,87 +22,76 @@
 
 	</style>
 </head>
+
 <body>
 	<div class="wrapper">
 
 		<header class="header">
-			<figure class="logo"><a href="index.html"><img src="img/logo.png" alt="Logo"></figure></a>
+			<figure class="logo"><a href="/"><img src="{% static 'img/logo.png' %}" alt="Logo"></figure></a>
 			<nav class="menu">
 				<ul>
 					<li><a href="index.html">Home</a></li>
 					<li><a>Genres</a>
 						<ul>
-							<li><a href="genre.html">Action</a></li>
-							<li><a href="genre.html">Comedy</a></li>
-							<li><a href="genre.html">Drama</a></li>
-							<li><a href="genre.html">Romance</a></li>
+							<li><a href="{% url 'movies:movie_category' 'action' %}">Action</a></li>
+							<li><a href="{% url 'movies:movie_category' 'comedy' %}">Comedy</a></li>
+							<li><a href="{% url 'movies:movie_category' 'drama' %}">Drama</a></li>
+							<li><a href="{% url 'movies:movie_category' 'romance' %}">Romance</a></li>
 						</ul>
 					</li>
 					<li><a>Year</a>
 						<ul>
-							<li><a href="year.html">2017</a></li>
-							<li><a href="year.html">2016</a></li>
-							<li><a href="year.html">2015</a></li>
-							<li><a href="year.html">2014</a></li>
+							<li><a href="{% url 'movies:movie_year' year=2019 %}">2019</a></li>
+							<li><a href="{% url 'movies:movie_year' year=2018 %}">2018</a></li>
+							<li><a href="{% url 'movies:movie_year' year=2017 %}">2017</a></li>
+							<li><a href="{% url 'movies:movie_year' year=2016 %}">2016</a></li>
 						</ul>
 					</li>
 					<li><a>Language</a>
 						<ul>
-							<li><a href="language.html">English</a></li>
-							<li><a href="language.html">German</a></li>
+							<li><a href="{% url 'movies:movie_language' 'en' %}">English</a></li>
+							<li><a href="{% url 'movies:movie_language' 'gr' %}">German</a></li>
 						</ul>
 					</li>
 					<li><a href="mostwatched.html">Most Watched</a></li>
 					<li class="mobsearch">
-						<form class="mobform">
-							<input type="text" name="s" class="mobsearchfield" placeholder="Search...">
+						<form class="mobform" method="GET">
+							<input type="text" name="query" value="{{ request.GET.q }}" class="mobsearchfield"
+								placeholder="Search...">
 							<input type="submit" value="" class="mobsearchsubmit">
 						</form>
 					</li>
 				</ul>
 			</nav>
-			<form class="search">
-				<input type="text" name="s" class="searchfield" placeholder="Search...">
+			<form class="search" method="GET" action="{% url 'movies:movie_search' %}">
+				<input type="text" name="query" class="searchfield" placeholder="Search...">
 				<input type="submit" value="" class="searchsubmit">
 			</form>
 
-			<div class="toggle"><img src="img/menu.svg"></div>
+			<div class="toggle"><img src="{% static 'img/menu.svg' %}"></div>
 		</header>
 		<!-- Swiper -->
 		<div class="homeslider">
 			<div class="swiper-container">
-
 				<div class="swiper-wrapper">
+
+
+					{% for movie in slider_movie %}
 					<div class="swiper-slide">
-						<img src="images/slider/poster2.jpg">
+						{% if movie.banner %}
+						<img src="{{ movie.banner.url }}">
+						{% endif %}
 						<div class="caption">
 							<div class="captioninside">
-								<h3>Movie Title</h3>
-								<p>Lorem ipsum dolor siamet</p>
-								<a href="single.html" class="playbutton">Play</a>
+								<h3>{{ movie.title }}</h3>
+								<p>{{ movie.description }}</p>
+								<a href="{% url 'movie:movie_detail' movie.slug %}" class="playbutton">Play</a>
 							</div>
 						</div>
 					</div>
-					<div class="swiper-slide">
-						<img src="images/slider/poster1.jpg">
-						<div class="caption">
-							<div class="captioninside">
-								<h3>Movie Title 2</h3>
-								<p>Lorem ipsum dolor siamet</p>
-								<a href="single.html" class="playbutton">Play</a>
-							</div>
-						</div>
-					</div>
-					<div class="swiper-slide">
-						<img src="images/slider/poster2.jpg">
-						<div class="caption">
-							<div class="captioninside">
-								<h3>Movie Title 3</h3>
-								<p>Lorem ipsum dolor siamet</p>
-								<a href="single.html" class="playbutton">Play</a>
-							</div>
-						</div>
-					</div>
+					{% endfor %}
+					
+					
 				</div>
 				<!-- Add Pagination -->
 				<div class="swiper-pagination"></div>
@@ -109,11 +99,13 @@
 		</div>
 
 		{% block body %}
-		
+
 		{% endblock body %}
-		
+
 		<footer class="footer">
-			<div class="copyright"><p>Copyright &copy 2017 www.focusoncode.com</p></div>
+			<div class="copyright">
+				<p>Copyright &copy 2017 www.focusoncode.com</p>
+			</div>
 			<div class="footermenu">
 				<ul>
 					<li><a href="index.html">Home</a></li>
@@ -135,33 +127,33 @@
 		</footer>
 
 		<!-- Swiper JS -->
-		<script src="js/swiper.min.js"></script>
+		<script src="{% static 'js/swiper.min.js' %}"></script>
 
 		<!-- Initialize Swiper -->
 		<script>
-			$(document).ready(function(){
+			$(document).ready(function () {
 
 
 				var swiper = new Swiper('.homeslider > .swiper-container', {
 					pagination: '.swiper-pagination',
 					paginationClickable: true,
-					preventClicks:false,
-					preventClicksPropagation:false,
-					effect:'fade',
+					preventClicks: false,
+					preventClicksPropagation: false,
+					effect: 'fade',
 					breakpoints: {
 						320: {
-							height:200
+							height: 200
 						},
 
 						480: {
-							height:300
+							height: 300
 						},
 
 						768: {
-							height:400
+							height: 400
 						},
 						1024: {
-							height:500
+							height: 500
 						}
 					}
 				});
@@ -171,8 +163,8 @@
 					prevButton: '.recent-prev',
 					slidesPerView: 8,
 					paginationClickable: true,
-					preventClicks:false,
-					preventClicksPropagation:false,
+					preventClicks: false,
+					preventClicksPropagation: false,
 					spaceBetween: 10,
 					breakpoints: {
 						320: {
@@ -201,8 +193,8 @@
 					prevButton: '.most-prev',
 					slidesPerView: 8,
 					paginationClickable: true,
-					preventClicks:false,
-					preventClicksPropagation:false,
+					preventClicks: false,
+					preventClicksPropagation: false,
 					spaceBetween: 10,
 					breakpoints: {
 						320: {
@@ -231,8 +223,8 @@
 					prevButton: '.top-prev',
 					slidesPerView: 8,
 					paginationClickable: true,
-					preventClicks:false,
-					preventClicksPropagation:false,
+					preventClicks: false,
+					preventClicksPropagation: false,
 					spaceBetween: 10,
 					breakpoints: {
 						320: {
@@ -258,10 +250,11 @@
 
 			});
 
-			
+
 		</script>
 
 
 	</div>
 </body>
+
 </html>
